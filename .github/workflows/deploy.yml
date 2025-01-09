@@ -1,0 +1,47 @@
+name: Deploy Site
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - ".vscode/**"
+      - ".eslint*"
+      - "tsconfig*"
+
+jobs:
+  build-and-deploy:
+    if: github.repository == 'Aisen60/vant-theme'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy gh page
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.TOKEN_GH_PAGES }}
+          publish_dir: ./dist
