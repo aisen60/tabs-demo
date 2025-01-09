@@ -12,7 +12,6 @@ on:
 
 jobs:
   build-and-deploy:
-    if: github.repository == 'Aisen60/vant-theme'
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
